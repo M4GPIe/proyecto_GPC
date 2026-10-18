@@ -401,9 +401,7 @@ function startGame() {
     setBackgroundVideoPlaying(true);
     clock.start();
 
-    if (audioElement && audioListener.context.state === 'running') {
-        audioElement.play();
-    }
+    playAudio();
 }
 
 function togglePause() {
@@ -426,9 +424,8 @@ function togglePause() {
     }
 
     clock.start();
-    if (audioElement && audioListener.context.state === 'running') {
-        audioElement.play();
-    }
+   
+    playAudio();
 }
 
 function restartGame() {
@@ -631,6 +628,22 @@ function finishSong() {
 
     guiHud.hide();
     guiResults.show();
+}
+
+function playAudio() {
+    if (!audioElement) return;
+
+    if (audioListener && audioListener.context.state === 'suspended') {
+        audioListener.context.resume().then(function() {
+            audioElement.play().catch(function(err) {
+                console.error('Error al reproducir audio:', err);
+            });
+        });
+    } else {
+        audioElement.play().catch(function(err) {
+            console.error('Error al reproducir audio:', err);
+        });
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="es">
+	<head>
+		<meta charset="utf-8">
+		<title>Threejs App</title>
+		<style>
+			:root {
+				--app-font-family: 'Trebuchet MS', 'Segoe UI', Arial, sans-serif;
+				--color-background: #000;
+				--color-text: #fff;
+				--color-cyan: #00ffff;
+				--color-cyan-border: #00e5ff;
+				--color-gold: #ffcc00;
+				--color-pink: #fbd2fb;
+				--color-button: #ff0055;
+				--color-button-border: #ff3377;
+				--color-panel: rgba(12, 12, 18, 0.92);
+				--color-panel-field: rgba(0, 0, 0, 0.5);
+			}
+
+			body {
+				margin: 0;
+				overflow: hidden;
+				background-color: var(--color-background);
+			}
+
+			.lil-gui {
+				--font-family: var(--app-font-family);
+				--font-size: 16px;
+				--background-color: var(--color-panel);
+				--text-color: var(--color-text);
+				--number-color: var(--color-cyan);
+				--string-color: #ffaa00;
+
+				overflow: hidden;
+				border: 2px solid var(--color-cyan-border);
+				border-radius: 8px;
+				box-shadow: 0 8px 25px rgba(0, 0, 0, 0.8), 0 0 15px rgba(0, 229, 255, 0.3);
+				backdrop-filter: blur(6px);
+			}
+
+			.lil-gui.no-collapse .title {
+				pointer-events: none;
+			}
+
+			.lil-gui.no-collapse .title::before {
+				display: none !important;
+			}
+
+			.lil-gui .title {
+				padding: 10px 14px;
+				border-bottom: 2px solid #f700ff;
+				background: linear-gradient(180deg, #2a2a38 0%, #151520 100%);
+				color: var(--color-gold);
+				font-family: var(--app-font-family);
+				font-size: 20px;
+				letter-spacing: 1.5px;
+				text-transform: uppercase;
+				text-shadow: 0 0 10px rgba(255, 204, 0, 0.6);
+			}
+
+			.lil-gui .controller {
+				margin: 2px 0;
+				padding: 8px 12px;
+			}
+
+			.lil-gui .name {
+				color: var(--color-text);
+				font-size: 15px;
+				font-weight: bold;
+				text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+			}
+
+			.lil-gui .controller.button .widget {
+				padding: 6px 0;
+				border: 1px solid var(--color-button-border);
+				border-radius: 5px;
+				background: linear-gradient(180deg, var(--color-button) 0%, #990033 100%);
+				box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+				color: var(--color-text);
+				font-size: 15px;
+				font-weight: bold;
+				letter-spacing: 1px;
+				text-transform: uppercase;
+				transition: all 0.2s ease;
+			}
+
+			.lil-gui .controller.button .widget:hover {
+				transform: scale(1.02);
+				background: linear-gradient(180deg, var(--color-button-border) 0%, #cc0044 100%);
+				box-shadow: 0 0 15px rgba(255, 0, 85, 0.9);
+				cursor: pointer;
+			}
+
+			.lil-gui .controller.disabled {
+				opacity: 1 !important;
+			}
+
+			.lil-gui .controller.disabled .widget {
+				border: 1px solid rgba(0, 229, 255, 0.4);
+				border-radius: 4px;
+				background: var(--color-panel-field);
+				color: var(--color-cyan);
+				font-size: 17px;
+				font-weight: bold;
+				opacity: 1;
+				text-align: center;
+			}
+
+			#pause-overlay {
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				z-index: 999;
+				display: none;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+				gap: 15px;
+				transform: translate(-50%, -50%);
+				pointer-events: none;
+			}
+
+			.pause-icon {
+				display: flex;
+				width: 60px;
+				height: 70px;
+				justify-content: space-between;
+			}
+
+			.pause-icon span {
+				width: 20px;
+				height: 100%;
+				border-radius: 5px;
+				background-color: var(--color-pink);
+				box-shadow: 0 0 20px #ff00eacc, 0 0 10px #ff00eacc;
+			}
+
+			.pause-text {
+				color: var(--color-pink);
+				font-family: var(--app-font-family);
+				font-size: 24px;
+				font-weight: bold;
+				letter-spacing: 4px;
+				text-shadow: 0 0 10px rgba(245, 90, 235, 0.8);
+			}
+
+			#background-video {
+				position: fixed;
+				top: 0;
+				left: 0;
+				z-index: -1;
+				width: 100vw;
+				height: 100vh;
+				object-fit: cover;
+				filter: brightness(0.4);
+			}
+		</style>
+	</head>
+	<body>
+		<div id="container"></div>
+
+		<video id="background-video" loop muted playsinline></video>
+
+		<div id="pause-overlay">
+			<div class="pause-icon">
+				<span></span>
+				<span></span>
+			</div>
+			<div class="pause-text">PAUSA</div>
+		</div>
+
+		<script src="lib/three.min_r140.js"></script>
+		<script src="lib/lil-gui_0.16.1.js"></script>
+		<script src="js/aaa_proyecto.js"></script>
+	</body>
+</html>

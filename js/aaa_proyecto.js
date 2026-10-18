@@ -31,7 +31,7 @@ var GAME_CONFIG = Object.freeze({
 
     // Background and textures
     trackTexturePath: 'images/guitar_neck.jpg',
-    backgroundVideoPath: 'https://github.com/M4GPIe/proyecto_GPC/releases/download/video/fondo.mp4',
+    backgroundVideoPath: 'videos/fondo.mp4',
     containerId: 'container',
     backgroundVideoId: 'background-video',
     pauseOverlayId: 'pause-overlay',
@@ -46,7 +46,7 @@ var GAME_CONFIG = Object.freeze({
 
     // Labels for GUI elements and messages
     labels: {
-        startTitle: '¡GUITAR HERO!',
+        startTitle: 'BASS HERO!',
         startButton: '¡EMPEZAR JUEGO! [ESPACIO]',
         songTitle: 'Canción Seleccionada',
         songName: 'Nombre',

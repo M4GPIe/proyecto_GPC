@@ -122,7 +122,7 @@ var guiSongControls = {
 
 var guiStartControls = {
     play: function() {
-        restartGame();
+        startGame();
     }
 };
 

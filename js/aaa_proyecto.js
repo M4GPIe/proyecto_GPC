@@ -31,7 +31,7 @@ var GAME_CONFIG = Object.freeze({
 
     // Background and textures
     trackTexturePath: 'images/guitar_neck.jpg',
-    backgroundVideoPath: 'videos/fondo.mp4',
+    backgroundVideoPath: 'https://github.com/M4GPIe/proyecto_GPC/releases/download/video/fondo.mp4',
     containerId: 'container',
     backgroundVideoId: 'background-video',
     pauseOverlayId: 'pause-overlay',

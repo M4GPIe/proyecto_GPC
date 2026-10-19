@@ -628,6 +628,7 @@ function finishSong() {
 
     guiHud.hide();
     guiResults.show();
+    guiSong.show();
 }
 
 function playAudio() {

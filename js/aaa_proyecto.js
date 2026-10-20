@@ -51,6 +51,7 @@ var GAME_CONFIG = Object.freeze({
         songTitle: 'Canción Seleccionada',
         songName: 'Nombre',
         speed: 'Velocidad',
+        songDuration: 'Duración',
         scoreTitle: 'Marcador',
         hits: 'Aciertos',
         misses: 'Fallos',
@@ -80,6 +81,7 @@ var isPaused = true;
 // Song and notes
 var activeSongName = GAME_CONFIG.defaultSongName;
 var activeSong = null;
+var activeSongDuration = null;
 
 var noteSpeed = GAME_CONFIG.initialNoteSpeed;
 var noteTravelTime = 0;
@@ -117,7 +119,8 @@ var guiHud;
 var guiResults;
 var guiSongControls = {
     name: activeSongName,
-    speed: noteSpeed
+    speed: noteSpeed,
+    duration: activeSongDuration
 };
 
 var guiStartControls = {
@@ -213,6 +216,8 @@ function initializeGUIs() {
     guiSong.domElement.classList.add('no-collapse');
     guiSong.add(guiSongControls, 'name').name(GAME_CONFIG.labels.songName).disable();
     guiSong.add(guiSongControls, 'speed').name(GAME_CONFIG.labels.speed).listen().disable();
+    guiSong.add(guiSongControls, 'duration').name(GAME_CONFIG.labels.songDuration).listen().disable();
+    
 
     guiHud = new lil.GUI({ title: GAME_CONFIG.labels.scoreTitle, width: 430, height: 350 });
     guiHud.add(guiHudControls, 'hitCount').name(GAME_CONFIG.labels.hits).listen().disable();
@@ -593,7 +598,7 @@ function onSongMapLoaded(event) {
         console.error('The song map did not define activeSong.');
         return;
     }
-
+    songDuration = activeSong.duration || 'Unknown';
     noteSpeed = activeSong.noteSpeed || GAME_CONFIG.initialNoteSpeed;
     noteTravelTime = (GAME_CONFIG.hitZoneZ - GAME_CONFIG.noteStartZ) / noteSpeed;
     guiSongControls.speed = noteSpeed;

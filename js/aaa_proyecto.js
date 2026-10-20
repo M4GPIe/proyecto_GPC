@@ -81,7 +81,7 @@ var isPaused = true;
 // Song and notes
 var activeSongName = GAME_CONFIG.defaultSongName;
 var activeSong = null;
-var activeSongDuration = null;
+var activeSongDuration = '0:00';
 
 var noteSpeed = GAME_CONFIG.initialNoteSpeed;
 var noteTravelTime = 0;
@@ -346,6 +346,10 @@ function setupInput() {
 function handleKeyDown(event) {
     if (audioListener && audioListener.context.state === 'suspended') {
         audioListener.context.resume();
+    }
+
+    if (event.code === 'Tab') {
+        return; 
     }
 
     if (event.code === 'Space') {

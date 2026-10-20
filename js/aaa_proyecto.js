@@ -349,6 +349,7 @@ function handleKeyDown(event) {
     }
 
     if (event.code === 'Tab') {
+        event.preventDefault();
         return; 
     }
 

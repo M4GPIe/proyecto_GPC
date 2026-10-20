@@ -1,7 +1,7 @@
 var activeSong = {
     title: "Seven Nation Army",
     noteSpeed: 12, 
-    
+    duration: 230.68,
     notes: [
 
     // easy loop x8

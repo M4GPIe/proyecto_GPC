@@ -58,7 +58,6 @@ var GAME_CONFIG = Object.freeze({
         scoreTitle: 'Marcador',
         hits: 'Aciertos',
         misses: 'Fallos',
-        controls: 'Controles Carriles',
         mute: 'Mutear Música',
         pause: 'Pausar [ESPACIO]',
         restart: 'Reiniciar [DELETE]',
@@ -239,7 +238,6 @@ function initializeGUIs() {
     guiSong.add(guiSongControls, 'speed').name(GAME_CONFIG.labels.speed).listen().disable();
     guiSong.add(guiSongControls, 'duration').name(GAME_CONFIG.labels.songDuration).listen().disable();
 
-    // Botones de navegación colocados al final y organizados en la misma fila
     var btnPrev = guiSong.add(guiSongControls, 'prevSong').name(GAME_CONFIG.labels.prevSong);
     var btnNext = guiSong.add(guiSongControls, 'nextSong').name(GAME_CONFIG.labels.nextSong);
 

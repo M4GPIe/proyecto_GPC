@@ -16,6 +16,7 @@ var GAME_CONFIG = Object.freeze({
     missedNoteColor: 0x333333,
 
     // Song and audio settings
+    availableSongs: ['Seven_Nation_Army'],
     defaultSongName: 'Seven_Nation_Army',
     initialNoteSpeed: 10,
     audioVolume: 0.5,
@@ -50,14 +51,18 @@ var GAME_CONFIG = Object.freeze({
         startButton: '¡EMPEZAR JUEGO! [ESPACIO]',
         songTitle: 'Canción Seleccionada',
         songName: 'Nombre',
+        prevSong: '◄ Anterior',
+        nextSong: 'Siguiente ►',
         speed: 'Velocidad',
         songDuration: 'Duración',
         scoreTitle: 'Marcador',
         hits: 'Aciertos',
         misses: 'Fallos',
+        controls: 'Controles Carriles',
         mute: 'Mutear Música',
         pause: 'Pausar [ESPACIO]',
         restart: 'Reiniciar [DELETE]',
+        mainMenu: 'Menú Principal',
         finishedTitle: '¡Canción Finalizada!',
         totalHits: 'Aciertos Totales',
         totalMisses: 'Fallos Totales',
@@ -80,7 +85,8 @@ var gameState = GAME_CONFIG.gameStates.start;
 var isPaused = true;
 
 // Song and notes
-var activeSongName = GAME_CONFIG.defaultSongName;
+var activeSongIndex = 0;
+var activeSongName = GAME_CONFIG.availableSongs[activeSongIndex];
 var activeSong = null;
 var activeSongDuration = '0:00';
 
@@ -92,6 +98,7 @@ var activeNotes = [];
 // Game time
 var clock = new THREE.Clock();
 var gameTime = 0;
+var isRenderLoopStarted = false;
 
 // Player points
 var hitCount = 0;
@@ -121,10 +128,17 @@ var guiResults;
 var guiSongControls = {
     name: activeSongName,
     speed: noteSpeed,
-    duration: activeSongDuration
+    duration: activeSongDuration,
+    prevSong: function() {
+        changeSong(-1);
+    },
+    nextSong: function() {
+        changeSong(1);
+    }
 };
 
 var guiStartControls = {
+    controls: 'Q  |  W  |  E  |  R',
     play: function() {
         startGame();
     }
@@ -133,12 +147,16 @@ var guiStartControls = {
 var guiHudControls = {
     hitCount: 0,
     missCount: 0,
+    controls: 'Q  |  W  |  E  |  R',
     mute: false,
     togglePause: function() {
         togglePause();
     },
     restart: function() {
         restartGame();
+    },
+    mainMenu: function() {
+        returnToMainMenu();
     }
 };
 
@@ -148,6 +166,9 @@ var guiResultsControls = {
     accuracy: '0%',
     restart: function() {
         restartGame();
+    },
+    mainMenu: function() {
+        returnToMainMenu();
     }
 };
 
@@ -211,24 +232,28 @@ function updateAspectRatio() {
 function initializeGUIs() {
     guiStart = new lil.GUI({ title: GAME_CONFIG.labels.startTitle, width: 300 });
     guiStart.domElement.classList.add('no-collapse');
+    guiStart.add(guiStartControls, 'controls').name(GAME_CONFIG.labels.controls).disable();
     guiStart.add(guiStartControls, 'play').name(GAME_CONFIG.labels.startButton);
     centerGUI(guiStart);
 
     guiSong = new lil.GUI({ title: GAME_CONFIG.labels.songTitle, width: 430 });
     guiSong.domElement.classList.add('no-collapse');
-    guiSong.add(guiSongControls, 'name').name(GAME_CONFIG.labels.songName).disable();
+    guiSong.add(guiSongControls, 'name').name(GAME_CONFIG.labels.songName).listen().disable();
+    guiSong.add(guiSongControls, 'prevSong').name(GAME_CONFIG.labels.prevSong);
+    guiSong.add(guiSongControls, 'nextSong').name(GAME_CONFIG.labels.nextSong);
     guiSong.add(guiSongControls, 'speed').name(GAME_CONFIG.labels.speed).listen().disable();
     guiSong.add(guiSongControls, 'duration').name(GAME_CONFIG.labels.songDuration).listen().disable();
     
-
     guiHud = new lil.GUI({ title: GAME_CONFIG.labels.scoreTitle, width: 430, height: 350 });
     guiHud.add(guiHudControls, 'hitCount').name(GAME_CONFIG.labels.hits).listen().disable();
     guiHud.add(guiHudControls, 'missCount').name(GAME_CONFIG.labels.misses).listen().disable();
+    guiHud.add(guiHudControls, 'controls').name(GAME_CONFIG.labels.controls).disable();
     guiHud.add(guiHudControls, 'mute').name(GAME_CONFIG.labels.mute).onChange(function() {
         updateAudioVolume();
     });
     guiHud.add(guiHudControls, 'togglePause').name(GAME_CONFIG.labels.pause);
     guiHud.add(guiHudControls, 'restart').name(GAME_CONFIG.labels.restart);
+    guiHud.add(guiHudControls, 'mainMenu').name(GAME_CONFIG.labels.mainMenu);
     guiHud.domElement.classList.add('no-collapse');
     guiHud.hide();
 
@@ -238,6 +263,7 @@ function initializeGUIs() {
     guiResults.add(guiResultsControls, 'totalMisses').name(GAME_CONFIG.labels.totalMisses).listen().disable();
     guiResults.add(guiResultsControls, 'accuracy').name(GAME_CONFIG.labels.accuracy).listen().disable();
     guiResults.add(guiResultsControls, 'restart').name(GAME_CONFIG.labels.replay);
+    guiResults.add(guiResultsControls, 'mainMenu').name(GAME_CONFIG.labels.mainMenu);
     centerGUI(guiResults);
     guiResults.hide();
 }
@@ -250,6 +276,15 @@ function centerGUI(guiInstance) {
     element.style.transform = 'translate(-50%, -50%)';
     element.style.margin = '0';
     element.style.zIndex = '1000';
+}
+
+function changeSong(direction) {
+    if (gameState !== GAME_CONFIG.gameStates.start) return;
+    var songs = GAME_CONFIG.availableSongs;
+    activeSongIndex = (activeSongIndex + direction + songs.length) % songs.length;
+    activeSongName = songs[activeSongIndex];
+    guiSongControls.name = activeSongName;
+    loadSongMap(activeSongName);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -297,6 +332,8 @@ function createFretDividers() {
 }
 
 function createHitButtons() {
+    var keyLabels = ['Q', 'W', 'E', 'R'];
+
     for (var laneIndex = 0; laneIndex < GAME_CONFIG.laneColors.length; laneIndex++) {
         var button = new THREE.Object3D();
 
@@ -323,6 +360,24 @@ function createHitButtons() {
         var laneLight = new THREE.PointLight(GAME_CONFIG.laneColors[laneIndex], 0, 4);
         laneLight.position.set(GAME_CONFIG.lanePositions[laneIndex], 0.6, GAME_CONFIG.hitZoneZ - 0.75);
         scene.add(laneLight);
+
+        // Indicador 3D flotante con la letra correspondiente sobre la diana
+        var canvas = document.createElement('canvas');
+        canvas.width = 128;
+        canvas.height = 128;
+        var ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'Bold 80px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(keyLabels[laneIndex], 64, 64);
+
+        var texture = new THREE.CanvasTexture(canvas);
+        var labelMaterial = new THREE.SpriteMaterial({ map: texture, depthTest: false });
+        var labelSprite = new THREE.Sprite(labelMaterial);
+        labelSprite.scale.set(0.5, 0.5, 1);
+        labelSprite.position.set(GAME_CONFIG.lanePositions[laneIndex], 0.45, GAME_CONFIG.hitZoneZ - 0.75);
+        scene.add(labelSprite);
 
         hitButtons.push({
             mesh: button,
@@ -404,7 +459,7 @@ function handleKeyUp(event) {
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Play / Pause / Restart
+// Play / Pause / Restart / Menu Navigation
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 function startGame() {
@@ -465,6 +520,39 @@ function restartGame() {
 
     guiResults.hide();
     startGame();
+}
+
+function returnToMainMenu() {
+    if (audioElement) {
+        audioElement.pause();
+        audioElement.currentTime = 0;
+    }
+
+    clock.stop();
+    isPaused = true;
+    gameState = GAME_CONFIG.gameStates.start;
+
+    clearActiveNotes();
+    nextNoteIndex = 0;
+    gameTime = 0;
+    hitCount = 0;
+    missCount = 0;
+    heldLanes = [false, false, false, false];
+    for (var laneIndex = 0; laneIndex < hitButtons.length; laneIndex++) {
+        setLaneButtonPressed(laneIndex, false);
+    }
+    isMissLightAnimating = false;
+    missLight.intensity = 0;
+    guiHudControls.hitCount = 0;
+    guiHudControls.missCount = 0;
+
+    setPauseOverlayVisible(false);
+    guiHud.hide();
+    guiResults.hide();
+
+    guiStart.show();
+    guiSong.show();
+    setBackgroundVideoPlaying(false);
 }
 
 function setPauseOverlayVisible(isVisible) {
@@ -595,7 +683,14 @@ function triggerMissLight() {
 
 // load song notes script and initialize audio player
 function loadSongMap(songName) {
+    var oldScript = document.getElementById('song-map-script');
+    if (oldScript) {
+        oldScript.remove();
+    }
+    activeSong = null;
+
     var script = document.createElement('script');
+    script.id = 'song-map-script';
     script.src = GAME_CONFIG.noteMapDirectory + songName + GAME_CONFIG.noteMapExtension;
     script.onload = onSongMapLoaded;
     script.onerror = onSongMapLoadError;
@@ -608,10 +703,13 @@ function onSongMapLoaded(event) {
         console.error('The song map did not define activeSong.');
         return;
     }
-    songDuration = activeSong.duration || 'Unknown';
+    activeSongDuration = activeSong.duration || 'Unknown';
     noteSpeed = activeSong.noteSpeed || GAME_CONFIG.initialNoteSpeed;
     noteTravelTime = (GAME_CONFIG.hitZoneZ - GAME_CONFIG.noteStartZ) / noteSpeed;
+    
     guiSongControls.speed = noteSpeed;
+    guiSongControls.duration = activeSongDuration;
+
     loadAudio(event.target.dataset.songName);
     startRenderLoop();
 }
@@ -627,6 +725,9 @@ function updateAudioVolume() {
 }
 
 function loadAudio(songName) {
+    if (audioElement) {
+        audioElement.pause();
+    }
     audioElement = document.createElement('audio');
     audioElement.src = GAME_CONFIG.audioDirectory + songName + GAME_CONFIG.audioExtension;
     audioElement.load();
@@ -836,7 +937,10 @@ function renderFrame() {
 }
 
 function startRenderLoop() {
-    renderFrame();
+    if (!isRenderLoopStarted) {
+        isRenderLoopStarted = true;
+        renderFrame();
+    }
 }
 
 initializeGame();

@@ -55,6 +55,7 @@ var GAME_CONFIG = Object.freeze({
         scoreTitle: 'Marcador',
         hits: 'Aciertos',
         misses: 'Fallos',
+        mute: 'Mutear Música',
         pause: 'Pausar [ESPACIO]',
         restart: 'Reiniciar [DELETE]',
         finishedTitle: '¡Canción Finalizada!',
@@ -132,6 +133,7 @@ var guiStartControls = {
 var guiHudControls = {
     hitCount: 0,
     missCount: 0,
+    mute: false,
     togglePause: function() {
         togglePause();
     },
@@ -222,6 +224,9 @@ function initializeGUIs() {
     guiHud = new lil.GUI({ title: GAME_CONFIG.labels.scoreTitle, width: 430, height: 350 });
     guiHud.add(guiHudControls, 'hitCount').name(GAME_CONFIG.labels.hits).listen().disable();
     guiHud.add(guiHudControls, 'missCount').name(GAME_CONFIG.labels.misses).listen().disable();
+    guiHud.add(guiHudControls, 'mute').name(GAME_CONFIG.labels.mute).onChange(function() {
+        updateAudioVolume();
+    });
     guiHud.add(guiHudControls, 'togglePause').name(GAME_CONFIG.labels.pause);
     guiHud.add(guiHudControls, 'restart').name(GAME_CONFIG.labels.restart);
     guiHud.domElement.classList.add('no-collapse');
@@ -615,12 +620,18 @@ function onSongMapLoadError(event) {
     console.error('Unable to load the song map: ' + event.target.src);
 }
 
+function updateAudioVolume() {
+    if (gameAudio) {
+        gameAudio.setVolume(guiHudControls.mute ? 0 : GAME_CONFIG.audioVolume);
+    }
+}
+
 function loadAudio(songName) {
     audioElement = document.createElement('audio');
     audioElement.src = GAME_CONFIG.audioDirectory + songName + GAME_CONFIG.audioExtension;
     audioElement.load();
     gameAudio.setMediaElementSource(audioElement);
-    gameAudio.setVolume(GAME_CONFIG.audioVolume);
+    updateAudioVolume();
     audioElement.onended = finishSong;
 }
 

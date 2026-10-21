@@ -138,7 +138,6 @@ var guiSongControls = {
 };
 
 var guiStartControls = {
-    controls: 'Q  |  W  |  E  |  R',
     play: function() {
         startGame();
     }
@@ -147,7 +146,6 @@ var guiStartControls = {
 var guiHudControls = {
     hitCount: 0,
     missCount: 0,
-    controls: 'Q  |  W  |  E  |  R',
     mute: false,
     togglePause: function() {
         togglePause();
@@ -232,22 +230,36 @@ function updateAspectRatio() {
 function initializeGUIs() {
     guiStart = new lil.GUI({ title: GAME_CONFIG.labels.startTitle, width: 300 });
     guiStart.domElement.classList.add('no-collapse');
-    guiStart.add(guiStartControls, 'controls').name(GAME_CONFIG.labels.controls).disable();
     guiStart.add(guiStartControls, 'play').name(GAME_CONFIG.labels.startButton);
     centerGUI(guiStart);
 
     guiSong = new lil.GUI({ title: GAME_CONFIG.labels.songTitle, width: 430 });
     guiSong.domElement.classList.add('no-collapse');
     guiSong.add(guiSongControls, 'name').name(GAME_CONFIG.labels.songName).listen().disable();
-    guiSong.add(guiSongControls, 'prevSong').name(GAME_CONFIG.labels.prevSong);
-    guiSong.add(guiSongControls, 'nextSong').name(GAME_CONFIG.labels.nextSong);
     guiSong.add(guiSongControls, 'speed').name(GAME_CONFIG.labels.speed).listen().disable();
     guiSong.add(guiSongControls, 'duration').name(GAME_CONFIG.labels.songDuration).listen().disable();
-    
+
+    // Botones de navegación colocados al final y organizados en la misma fila
+    var btnPrev = guiSong.add(guiSongControls, 'prevSong').name(GAME_CONFIG.labels.prevSong);
+    var btnNext = guiSong.add(guiSongControls, 'nextSong').name(GAME_CONFIG.labels.nextSong);
+
+    var songNavRow = document.createElement('div');
+    songNavRow.style.display = 'flex';
+    songNavRow.style.flexDirection = 'row';
+    songNavRow.style.width = '100%';
+
+    btnPrev.domElement.style.flex = '1';
+    btnNext.domElement.style.flex = '1';
+
+    songNavRow.appendChild(btnPrev.domElement);
+    songNavRow.appendChild(btnNext.domElement);
+
+    var guiChildren = guiSong.domElement.querySelector('.children') || guiSong.domElement;
+    guiChildren.appendChild(songNavRow);
+
     guiHud = new lil.GUI({ title: GAME_CONFIG.labels.scoreTitle, width: 430, height: 350 });
     guiHud.add(guiHudControls, 'hitCount').name(GAME_CONFIG.labels.hits).listen().disable();
     guiHud.add(guiHudControls, 'missCount').name(GAME_CONFIG.labels.misses).listen().disable();
-    guiHud.add(guiHudControls, 'controls').name(GAME_CONFIG.labels.controls).disable();
     guiHud.add(guiHudControls, 'mute').name(GAME_CONFIG.labels.mute).onChange(function() {
         updateAudioVolume();
     });

@@ -1,7 +1,7 @@
 var activeSong = {
     title: "One Step Closer",
     artist: "Linkin Park",
-    noteSpeed: 12, 
+    noteSpeed: 20, 
     duration: 169.74,
     notes: [
 

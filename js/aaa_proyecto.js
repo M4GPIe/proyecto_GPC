@@ -305,11 +305,18 @@ function centerGUI(guiInstance) {
 }
 
 function changeSong(direction) {
-    if (gameState !== GAME_CONFIG.gameStates.start) return;
+    if (gameState !== GAME_CONFIG.gameStates.start && gameState !== GAME_CONFIG.gameStates.finished) return;
+    
     var songs = GAME_CONFIG.availableSongs;
     activeSongIndex = (activeSongIndex + direction + songs.length) % songs.length;
     activeSongName = songs[activeSongIndex];
     guiSongControls.name = activeSongName;
+
+    // Reiniciar notas y tiempos de la canción previa
+    clearActiveNotes();
+    nextNoteIndex = 0;
+    gameTime = 0;
+
     loadSongMap(activeSongName);
 }
 
@@ -753,13 +760,15 @@ function updateAudioVolume() {
 }
 
 function loadAudio(songName) {
-    if (audioElement) {
+    if (!audioElement) {
+        audioElement = document.createElement('audio');
+        gameAudio.setMediaElementSource(audioElement);
+    } else {
         audioElement.pause();
     }
-    audioElement = document.createElement('audio');
+    
     audioElement.src = GAME_CONFIG.audioDirectory + songName + GAME_CONFIG.audioExtension;
     audioElement.load();
-    gameAudio.setMediaElementSource(audioElement);
     updateAudioVolume();
     audioElement.onended = finishSong;
 }

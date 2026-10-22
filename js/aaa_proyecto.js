@@ -33,7 +33,7 @@ var GAME_CONFIG = Object.freeze({
     // Background and textures
     trackTexturePath: 'images/guitar_neck.jpg',
     backgroundVideoPath: 'https://github.com/M4GPIe/proyecto_GPC/releases/download/video/fondo.mp4',
-    videoDirectory: 'https://github.com/M4GPIe/proyecto_GPC/releases/download/video/', 
+    videoDirectory: 'https://github.com/M4GPIe/proyecto_GPC/releases/download/', 
     videoExtension: '.mp4',
     containerId: 'container',
     backgroundVideoId: 'background-video',
@@ -226,7 +226,7 @@ function updateBackgroundVideo(songName) {
     var backgroundVideo = document.getElementById(GAME_CONFIG.backgroundVideoId);
     if (!backgroundVideo) return;
 
-    var songVideoPath = GAME_CONFIG.videoDirectory + songName + GAME_CONFIG.videoExtension;
+    var songVideoPath = GAME_CONFIG.videoDirectory + songName + '/' + songName + GAME_CONFIG.videoExtension;
 
     backgroundVideo.onerror = function() {
         backgroundVideo.onerror = null;

@@ -2,7 +2,7 @@ var activeSong = {
     title: "Feel Good Inc",
     noteSpeed: 14, 
     duration: 211.61,
-    notes:  [
+    notes:  [[
     1.505,
     3
   ],
@@ -2480,6 +2480,6 @@ var activeSong = {
     210.108,
     0,
     1.501
-  ]
+  ]]
 
 }

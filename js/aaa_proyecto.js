@@ -16,7 +16,7 @@ var GAME_CONFIG = Object.freeze({
     missedNoteColor: 0x333333,
 
     // Song and audio settings
-    availableSongs: ['Seven_Nation_Army','Break_Stuff'],
+    availableSongs: ['Seven_Nation_Army','Feel_Good_Inc'],
     defaultSongName: 'Seven_Nation_Army',
     initialNoteSpeed: 10,
     audioVolume: 0.5,

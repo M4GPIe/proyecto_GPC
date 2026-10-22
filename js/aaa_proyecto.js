@@ -33,6 +33,8 @@ var GAME_CONFIG = Object.freeze({
     // Background and textures
     trackTexturePath: 'images/guitar_neck.jpg',
     backgroundVideoPath: 'https://github.com/M4GPIe/proyecto_GPC/releases/download/video/fondo.mp4',
+    videoDirectory: 'https://github.com/M4GPIe/proyecto_GPC/releases/download/video/', 
+    videoExtension: '.mp4',
     containerId: 'container',
     backgroundVideoId: 'background-video',
     pauseOverlayId: 'pause-overlay',
@@ -211,15 +213,29 @@ function initializeScene() {
     camera.add(audioListener);
     gameAudio = new THREE.Audio(audioListener);
 
-    var backgroundVideo = document.getElementById(GAME_CONFIG.backgroundVideoId);
-    backgroundVideo.src = GAME_CONFIG.backgroundVideoPath;
-    backgroundVideo.load();
+    updateBackgroundVideo(activeSongName);
 }
 
 function updateAspectRatio() {
     renderer.setSize(window.innerWidth, window.innerHeight);
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
+}
+
+function updateBackgroundVideo(songName) {
+    var backgroundVideo = document.getElementById(GAME_CONFIG.backgroundVideoId);
+    if (!backgroundVideo) return;
+
+    var songVideoPath = GAME_CONFIG.videoDirectory + songName + GAME_CONFIG.videoExtension;
+
+    backgroundVideo.onerror = function() {
+        backgroundVideo.onerror = null;
+        backgroundVideo.src = GAME_CONFIG.backgroundVideoPath;
+        backgroundVideo.load();
+    };
+
+    backgroundVideo.src = songVideoPath;
+    backgroundVideo.load();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -693,6 +709,8 @@ function triggerMissLight() {
 
 // load song notes script and initialize audio player
 function loadSongMap(songName) {
+    updateBackgroundVideo(songName);
+
     var oldScript = document.getElementById('song-map-script');
     if (oldScript) {
         oldScript.remove();
